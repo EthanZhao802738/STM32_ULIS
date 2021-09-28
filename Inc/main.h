@@ -29,6 +29,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "constants.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -116,6 +117,7 @@ static const unsigned char crc_table[] =
 };
 
 /* USER CODE BEGIN Private defines */
+
 
 /* USER CODE END Private defines */
 

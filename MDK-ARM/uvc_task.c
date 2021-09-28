@@ -11,7 +11,7 @@
 extern volatile uint8_t g_uvc_stream_status;
 extern uint8_t gRGBBuf[FRAME_LINE_LENGTH * IMAGE_NUM_LINES * 3];
 extern uint16_t gDataBufferComplete[IMGSIZE];
-
+extern bool g_bCameraReset;
 bool b_uvcSending;
 void TemperatureToRGB(uint8_t *dst,uint8_t *pBuf);
 
@@ -29,10 +29,12 @@ PT_THREAD( uvc_task(struct pt *pt_ptr))
 	image_num_segments = 1;
 	uvc_xmit_row = 0;
 	uvc_xmit_plane = 0;
+	uint8_t *rgbLine = NULL;
+	
 	
 	while(1)
 	{
-		PT_WAIT_UNTIL(pt_ptr,((g_uvc_stream_status == 1 || g_uvc_stream_status == 2)));
+		PT_WAIT_UNTIL(pt_ptr,(((g_uvc_stream_status == 1 || g_uvc_stream_status == 2 ) && g_bCameraReset == false)));
 		if(g_uvc_stream_status == 1)
 		{
 			uvc_header[0] = 2;
@@ -60,11 +62,24 @@ PT_THREAD( uvc_task(struct pt *pt_ptr))
 					g_uvc_stream_status = 2;
 				}
 				
-				for(int i = 0; i < FRAME_LINE_LENGTH; i++)
+				if(g_bCameraReset == true)
 				{
-					packet[count++] = rgbLine[idx++];
-					packet[count++] = rgbLine[idx++];
-					packet[count++] = rgbLine[idx++];
+					for( int i = 0; i < FRAME_LINE_LENGTH; i++)
+					{
+						packet[count++] = 0;
+						packet[count++] = 0;
+						packet[count++] = 0;
+						idx += 3;
+					}
+				}
+				else
+				{
+					for( int i = 0; i < FRAME_LINE_LENGTH; i++)
+					{
+						packet[count++] = rgbLine[idx++];
+						packet[count++] = rgbLine[idx++];
+						packet[count++] = rgbLine[idx++];
+					}
 				}
 				uvc_xmit_row++;
 			}
@@ -86,6 +101,7 @@ PT_THREAD( uvc_task(struct pt *pt_ptr))
 				uvc_header[1] ^= 1;
 				uvc_xmit_seg = 0;
 				b_uvcSending = false;
+					
 				PT_EXIT(pt_ptr);
 			}
 			else if(uvc_xmit_row == (IMAGE_NUM_LINES))

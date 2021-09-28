@@ -51,6 +51,7 @@ adl064uvcf411\uvc_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 adl064uvcf411\uvc_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 adl064uvcf411\uvc_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 adl064uvcf411\uvc_task.o: ../Inc/main.h
+adl064uvcf411\uvc_task.o: ../Inc/constants.h
 adl064uvcf411\uvc_task.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h
 adl064uvcf411\uvc_task.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h
 adl064uvcf411\uvc_task.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h

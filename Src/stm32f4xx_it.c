@@ -19,9 +19,11 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdbool.h>
 #include "main.h"
 #include "stm32f4xx_it.h"
 #include "constants.h"
+
 
 
 
@@ -39,6 +41,7 @@
 //#define IMGSIZE					6423 
 //#define IMGSIZE							6426		//hamlet for header 0xFF00 0x00FF......footer 0x0FF0
 //#define BUFFER_SIZE			128
+#define ONE_SEC 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -89,6 +92,13 @@ extern TIM_HandleTypeDef htim3;
 extern volatile uint8_t I2cCheckFlag;
 extern uint8_t i2c_buffer[sizeof(float)];
 extern void I2C_reset();
+extern bool g_bCameraReset;
+extern bool g_bStopUVC;
+
+extern bool g_bAbortFirstFrameAfterReboot;
+extern bool g_bStartDetectBadLine;
+static int g_iCameraResetCnt = 0;
+bool g_bCameraResetDone = false;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -246,25 +256,58 @@ void RCC_IRQHandler(void)
 void DMA1_Stream3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
-
   /* USER CODE END DMA1_Stream3_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_spi2_rx);
   /* USER CODE BEGIN DMA1_Stream3_IRQn 1 */
-
   /* USER CODE END DMA1_Stream3_IRQn 1 */
 }
 
 /**
   * @brief This function handles EXTI line[9:5] interrupts.
   */
+
+extern uint16_t gDataBufferRx[IMGSIZE];
+extern void MX_SPI2_Init(void);
+extern DMA_HandleTypeDef hdma_spi2_rx;
+
+
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-
+	
+	static int iRecoverCnt = 0;
+	
+	static int iTempCnt = 0;
+	
+	iTempCnt++;
   /* USER CODE END EXTI9_5_IRQn 0 */
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+	if(g_bCameraReset == false)
+	{
+		if(g_iCameraResetCnt == 0 || g_iCameraResetCnt < 0)
+			g_iCameraResetCnt = 0;
+		else
+			g_iCameraResetCnt -= 4;
+	}
+
+	if(g_bAbortFirstFrameAfterReboot == true)
+	{	
+		iRecoverCnt ++;
+		if(iRecoverCnt > 10)
+		{	
+  		HAL_SPI_DMAResume(&hspi2);
+			g_bAbortFirstFrameAfterReboot = false;
+			g_bCameraResetDone = true;
+		}
+	}
+	else
+	{
+		g_bCameraReset = false;
+	}
+	
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
   /* USER CODE END EXTI9_5_IRQn 1 */
+	
 }
 
 /**
@@ -301,6 +344,7 @@ void SPI2_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
+
 	uint32_t tmp_flag = 0;
 	uint32_t temp;
 	static int iLastLen = 0;
@@ -345,6 +389,7 @@ void USART1_IRQHandler(void)
 			
 		}
 	}
+	
   /* USER CODE END USART1_IRQn 1 */
 }
 
@@ -469,8 +514,17 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 0 */
 	static uint16_t I2Cresetcnt = 0;
   HAL_TIM_IRQHandler(&htim3);
-  /* USER CODE BEGIN TIM3_IRQn 1 */
 	
+	
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+	static uint16_t msCnt = 0;
+	static uint16_t resetCnt = 0;
+	
+	if(g_bCameraResetDone == true)
+		resetCnt++;
+	
+	
+	msCnt++;
 	if(I2cCheckFlag == 1 && (hi2c1.Instance->SR2 & 0x06))
 	{
 		I2Cresetcnt++;
@@ -488,6 +542,34 @@ void TIM3_IRQHandler(void)
 		I2C_reset();
 		HAL_I2C_Slave_Transmit_IT(&hi2c1,i2c_buffer,5);
 	}
+	
+	if(g_bCameraReset == false)
+	{
+		if(g_iCameraResetCnt < 0)
+			g_iCameraResetCnt = 1;
+		else
+			g_iCameraResetCnt ++;
+	
+		if(g_iCameraResetCnt > 5)																			
+		{
+			g_iCameraResetCnt = 0;
+			g_bCameraReset = true;
+			g_bStartDetectBadLine = false;
+			g_bAbortFirstFrameAfterReboot = true;
+			HAL_SPI_DMAStop(&hspi2);
+		}
+	}
+	
+		
+	
+	if(resetCnt >= ONE_SEC * 8 && g_bCameraResetDone == true)
+	{
+		resetCnt = 0;
+		g_bStartDetectBadLine = true;
+		g_bCameraResetDone = false;
+	}
+	
+	
   /* USER CODE END TIM3_IRQn 1 */
 }
 

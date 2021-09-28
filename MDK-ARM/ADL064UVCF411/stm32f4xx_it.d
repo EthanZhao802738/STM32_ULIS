@@ -1,4 +1,5 @@
 adl064uvcf411\stm32f4xx_it.o: ../Src/stm32f4xx_it.c
+adl064uvcf411\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 adl064uvcf411\stm32f4xx_it.o: ../Inc/main.h
 adl064uvcf411\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 adl064uvcf411\stm32f4xx_it.o: ../Inc/stm32f4xx_hal_conf.h
@@ -39,5 +40,5 @@ adl064uvcf411\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_
 adl064uvcf411\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h
 adl064uvcf411\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h
 adl064uvcf411\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
-adl064uvcf411\stm32f4xx_it.o: ../Inc/stm32f4xx_it.h
 adl064uvcf411\stm32f4xx_it.o: ../Inc/constants.h
+adl064uvcf411\stm32f4xx_it.o: ../Inc/stm32f4xx_it.h

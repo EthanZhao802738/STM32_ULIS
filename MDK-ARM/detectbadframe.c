@@ -30,7 +30,7 @@ void DetectBadPixel(uint16_t *frameBuffer);
 
 uint16_t getNeighborAvg(const int x, const int y, uint16_t *frameBuffer, uint8_t *pDiffMap);
 bool getAvailableNeighbor(const int x, const int y, const int incX, const int incY, uint16_t *frameBuffer, uint8_t *pDiffMap,uint16_t *value);
-
+bool g_bStartDetectBadLine = true;
 
 PT_THREAD( DetectBadLine_task(struct pt *pt_ptr))
 {
@@ -42,19 +42,13 @@ PT_THREAD( DetectBadLine_task(struct pt *pt_ptr))
 	
 	while(1)
 	{
-		PT_WAIT_UNTIL(pt_ptr,((HAL_GetTick() - detectBandLineTime) > ONESECONDE) && b_ReveiveData == false && b_uvcSending == false);
+		PT_WAIT_UNTIL(pt_ptr,((HAL_GetTick() - detectBandLineTime) > ONESECONDE) && b_ReveiveData == false && b_uvcSending == false && g_bStartDetectBadLine == true);
 		
 		memcpy(gDataBufferBadLineDeted,gDataBufferComplete,IMGSIZE * sizeof(uint16_t));
 		
-		/*for(int i = 0; i < 10; i++)
-		{
-			DetectBadLine(&gDataBufferBadLineDeted[2],White);
-			DetectBadLine(&gDataBufferBadLineDeted[2],Black);
-			FixBadLine(lineMapWhite,&gDataBufferBadLineDeted[2]);
-			FixBadLine(lineMapBlack,&gDataBufferBadLineDeted[2]);
-		}*/
-		DetectBadLine(&gDataBufferBadLineDeted[2],White);
-		DetectBadPixel(&gDataBufferTx[2]);
+
+		/*DetectBadLine(&gDataBufferBadLineDeted[2],White);
+		DetectBadPixel(&gDataBufferTx[2]);*/
 		detectBandLineTime = HAL_GetTick();
 	}
 	
