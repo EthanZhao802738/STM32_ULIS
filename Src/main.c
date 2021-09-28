@@ -294,17 +294,11 @@ int main(void)
 		}
   }
 	
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	CheckThermalReady();
 	
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
+	CheckThermalReady();
 	DetectBadFrameInit();
 	
-	
+	HAL_UART_MspDeInit(&huart1);
 	//memcpy(gDataBufferTxComplete,gDataBufferComplete,IMGSIZE * sizeof(uint16_t));
 	
 	gDataBufferComplete[ IMGSIZE - 6] = gDataBufferComplete[ IMGSIZE - 1];
