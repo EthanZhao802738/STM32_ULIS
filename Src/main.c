@@ -316,10 +316,6 @@ int main(void)
 		PT_SCHEDULE(uvc_task(&uvc_task_pt));
 		PT_SCHEDULE(DetectBadLine_task(&detectbadline_task_pt));
 		PT_SCHEDULE(SendToPi_task(&spi_task_pt));
-		
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
 	}
 	
 	
