@@ -1,4 +1,4 @@
-adl064uvcf411\uvc_task.o: uvc_task.c
+adl064uvcf411\uvc_task.o: ..\Src\uvc_task.c
 adl064uvcf411\uvc_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 adl064uvcf411\uvc_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 adl064uvcf411\uvc_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
@@ -57,4 +57,3 @@ adl064uvcf411\uvc_task.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/us
 adl064uvcf411\uvc_task.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h
 adl064uvcf411\uvc_task.o: ../Middlewares/ST/STM32_USB_Device_Library/Class/video/Inc/uvc.h
 adl064uvcf411\uvc_task.o: ../Inc/usbd_uvc_if.h
-adl064uvcf411\uvc_task.o: constants.h

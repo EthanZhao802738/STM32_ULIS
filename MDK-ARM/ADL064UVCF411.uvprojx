@@ -434,19 +434,19 @@
               <FilePath>../Src/stm32f4xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>spi_task.c</FileName>
+              <FileName>detectbadframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\spi_task.c</FilePath>
+              <FilePath>..\Src\detectbadframe.c</FilePath>
             </File>
             <File>
               <FileName>uvc_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\uvc_task.c</FilePath>
+              <FilePath>..\Src\uvc_task.c</FilePath>
             </File>
             <File>
-              <FileName>detectbadframe.c</FileName>
+              <FileName>spi_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\detectbadframe.c</FilePath>
+              <FilePath>..\Src\spi_task.c</FilePath>
             </File>
           </Files>
         </Group>

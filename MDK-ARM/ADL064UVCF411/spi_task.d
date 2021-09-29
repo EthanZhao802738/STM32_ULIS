@@ -1,4 +1,4 @@
-adl064uvcf411\spi_task.o: spi_task.c
+adl064uvcf411\spi_task.o: ..\Src\spi_task.c
 adl064uvcf411\spi_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 adl064uvcf411\spi_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 adl064uvcf411\spi_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
@@ -44,4 +44,4 @@ adl064uvcf411\spi_task.o: ../Inc/pt.h
 adl064uvcf411\spi_task.o: ../Inc/lc.h
 adl064uvcf411\spi_task.o: ../Inc/lc-addrlabels.h
 adl064uvcf411\spi_task.o: ../Inc/tasks.h
-adl064uvcf411\spi_task.o: constants.h
+adl064uvcf411\spi_task.o: ../Inc/constants.h

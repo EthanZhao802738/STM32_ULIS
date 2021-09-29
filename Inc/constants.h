@@ -5,6 +5,7 @@
 //#define IMGSIZE							6423
 //#define IMGSIZE							6426		//hamlet for header 0xFF00 0x00FF......footer 0x0FF0
 #define IMGSIZE							(6431)		//hamlet for header 0xFF00 0x00FF......footer 0x0FF0 and 10 byte Version number
+//#define IMGSIZE					(6430)
 #define FRAME_LINE_LENGTH 	(80)
 #define IMAGE_NUM_LINES 		(82)		//hamlet for usb uvc 80 + 2 (debug lines)
 #define BUFFER_SIZE					(128)

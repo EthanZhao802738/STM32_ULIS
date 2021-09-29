@@ -1,4 +1,4 @@
-adl064uvcf411\detectbadframe.o: detectbadframe.c
+adl064uvcf411\detectbadframe.o: ..\Src\detectbadframe.c
 adl064uvcf411\detectbadframe.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 adl064uvcf411\detectbadframe.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 adl064uvcf411\detectbadframe.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
@@ -44,4 +44,4 @@ adl064uvcf411\detectbadframe.o: ../Inc/pt.h
 adl064uvcf411\detectbadframe.o: ../Inc/lc.h
 adl064uvcf411\detectbadframe.o: ../Inc/lc-addrlabels.h
 adl064uvcf411\detectbadframe.o: ../Inc/tasks.h
-adl064uvcf411\detectbadframe.o: constants.h
+adl064uvcf411\detectbadframe.o: ../Inc/constants.h

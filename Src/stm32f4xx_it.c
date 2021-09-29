@@ -79,8 +79,6 @@ extern DMA_HandleTypeDef hdma_usart1_tx;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
-extern uint16_t gDataBufferTx[IMGSIZE];
-extern uint16_t gDataBufferRx[IMGSIZE];
 extern uint8_t gIndexCounter;
 extern uint8_t gSPITrigger;
 
@@ -266,15 +264,9 @@ void DMA1_Stream3_IRQHandler(void)
   * @brief This function handles EXTI line[9:5] interrupts.
   */
 
-extern uint16_t gDataBufferRx[IMGSIZE];
-extern void MX_SPI2_Init(void);
-extern DMA_HandleTypeDef hdma_spi2_rx;
-
-
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-	
 	static int iRecoverCnt = 0;
 	
 	static int iTempCnt = 0;

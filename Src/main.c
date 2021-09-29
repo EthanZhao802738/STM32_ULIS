@@ -51,7 +51,6 @@ uint16_t gDataBufferTx[IMGSIZE] = {0};
 uint16_t gDataBufferRx[IMGSIZE] = {0};
 
 uint16_t *pDataBufferTx = NULL;
-uint16_t gDataBufferBadLineDeted[IMGSIZE];
 uint16_t gDataBufferComplete[IMGSIZE];
 uint8_t gIndexCounter = 0;
 uint8_t gSPITrigger = 1;
@@ -79,7 +78,6 @@ volatile uint8_t I2cCheckFlag = 0;
 uint16_t *framebufptr = NULL;
 uint8_t g_BadLine = 0;
 bool g_bCameraReset = false;
-
 bool spi_tx_pi_Cplt = false;
 bool g_bAbortFirstFrameAfterReboot = false;
 /* USER CODE END PTD */
@@ -137,16 +135,16 @@ static void MX_I2C1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_SPI2_Init(void);
 
-void MX_SPI1_Init(void);
-void MX_SPI2_Init(void);
 /* USER CODE BEGIN PFP */
 
-void I2C_reset();
-void ADC_Start();
-void SetI2CAsSlave();
-void DetectBadFrameInit();
-void CheckThermalReady();
+void I2C_reset(void);
+void ADC_Start(void);
+void SetI2CAsSlave(void);
+static void DetectBadFrameInit(void);
+static void CheckThermalReady(void);
 
 extern void DetectBadLine(uint16_t *frameBuffer,int type);
 extern void DetectBadPixel(uint16_t *frameBuffer);
@@ -219,9 +217,9 @@ int main(void)
 	SetI2CAsSlave();
 	ADC_Start();
 	
-	
   /* USER CODE BEGIN 2 */
-	uint16_t i;
+
+
 	
 	gDataBufferTx[0] = 0xFF00;
 	gDataBufferTx[1] = 0x00FF;
@@ -234,9 +232,7 @@ int main(void)
 //		gDataBufferRx[i] = i - 2;
 //	}
 
-	uint16_t temp;
-	
-	
+
 	gDataBufferTx[IMGSIZE - 1] = 0x0FF0;
 	gDataBufferRx[IMGSIZE - 1] = 0x0FF0;
 	gDataBufferTx[IMGSIZE - 2] = '2';														
@@ -250,8 +246,6 @@ int main(void)
 		gDataBufferRx[IMGSIZE - i] = gDataBufferTx[IMGSIZE - i];
 	}
 
-	int iDX = 0;
-	
 	
 	//execute uart command here
 	uint8_t aCmdD[] = "D";
@@ -298,12 +292,7 @@ int main(void)
 	CheckThermalReady();
 	DetectBadFrameInit();
 	
-	HAL_UART_MspDeInit(&huart1);
-	//memcpy(gDataBufferTxComplete,gDataBufferComplete,IMGSIZE * sizeof(uint16_t));
-	
-	gDataBufferComplete[ IMGSIZE - 6] = gDataBufferComplete[ IMGSIZE - 1];
-	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t *)gDataBufferComplete, IMGSIZE - 5);
-	
+	//HAL_UART_MspDeInit(&huart1);
 	gDataBufferComplete[ IMGSIZE - 6] = gDataBufferComplete[ IMGSIZE - 1];
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t *)gDataBufferComplete, IMGSIZE - 5);
 
@@ -375,7 +364,7 @@ void SystemClock_Config(void)
   * @param None
   * @retval None
   */
-void MX_SPI1_Init(void)
+static void MX_SPI1_Init(void)
 {
 
   /* USER CODE BEGIN SPI1_Init 0 */
@@ -416,7 +405,7 @@ void MX_SPI1_Init(void)
   * @param None
   * @retval None
   */
-void MX_SPI2_Init(void)
+static void MX_SPI2_Init(void)
 {
 
   /* USER CODE BEGIN SPI2_Init 0 */
@@ -559,7 +548,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : Vigil_VideoIN_Pin */
   GPIO_InitStruct.Pin = Vigil_VideoIN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(Vigil_VideoIN_GPIO_Port, &GPIO_InitStruct);
 
@@ -577,24 +566,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(SDA_GPIO_Port, &GPIO_InitStruct);*/
 	
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	
-  GPIO_InitStruct.Pin = GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-
-
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
@@ -853,11 +824,9 @@ static void ADC_Start()
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-
-	static float ADC_Value;
 	float value_f = 0;
 	uint8_t CRC_Result;
-	int temp,number,ADC_Step;
+	int ADC_Step;
 	for(int i = 0; i < ADC_NUMBER; i++)
 	{
 		value_f += adc_value[i];
@@ -907,19 +876,12 @@ void delay_us(uint32_t udelay)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	static int cnt = 0;
-	
 	if(GPIO_Pin == GPIO_PIN_8)
 	{
 		HAL_StatusTypeDef status;
 		uint16_t *pBuf = (uint16_t*) gDataBufferRx;
 		uint16_t *pBufShif = pBuf + 2;
-	
 		status = HAL_SPI_Receive_DMA( &hspi2, (uint8_t*)(pBufShif), (IMGSIZE - 8));
-
-			
-			
-		
 	}
 }
 
@@ -1055,19 +1017,20 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 		}
 		else if(g_BadLine == DynamicDetectBadLine)
 		{
-			memcpy(gDataBufferComplete, gDataBufferTx, IMGSIZE * sizeof(uint16_t));
+			/*memcpy(gDataBufferComplete, gDataBufferTx, IMGSIZE * sizeof(uint16_t));
 			FixBadLine(lineMapWhite,&gDataBufferComplete[2]);
-			FixBadPixel(&gDataBufferComplete[2]);
-			
+			FixBadPixel(&gDataBufferComplete[2]);*/
+			FixBadLine(lineMapWhite,&gDataBufferTx[2]);
+			FixBadPixel(&gDataBufferTx[2]);
 		}
 	
 	b_ReveiveData = false;
 }
 
-void DetectBadFrameInit()
+static void DetectBadFrameInit()
 {
 	g_BadLine = WhiteLineAllSection;
-	HAL_Delay(1000);
+	HAL_Delay(2000);
 	g_BadLine = DynamicDetectBadLine;
 }
 
@@ -1084,7 +1047,7 @@ uint8_t CaculateCRC(unsigned char *ptr, unsigned char len)
 
 
 
-void CheckThermalReady()
+static void CheckThermalReady()
 {
 	while(gDataBufferRx[10] >= 0x8000 || gDataBufferRx[10] == 0)
 	{
